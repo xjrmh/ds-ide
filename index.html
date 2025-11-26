@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search DS IDE</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">AI-based DS IDE for Search</p>
+      <h1>Centralized Toolkit for Search Data Scientists</h1>
+      <p class="lede">Standardize relevance & adoption metrics, automate analysis & reporting, and support planning/goaling end-to-end.</p>
+    </div>
+    <div class="badge-tray">
+      <span class="pill">Search Relevance</span>
+      <span class="pill">AI Adoption</span>
+      <span class="pill">LLM Guardrails</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" id="ingest">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Data Intake</p>
+          <h2>Upload data or use a URL</h2>
+          <p class="hint">Initial data cleaning, profiling, and exploratory analysis for search logs kick off automatically.</p>
+        </div>
+        <div class="input-row">
+          <label class="file-upload">Upload file
+            <input type="file" id="fileInput" accept=".csv,.tsv,.txt,.json" />
+          </label>
+          <div class="url-input">
+            <input type="text" id="urlInput" placeholder="https://..." aria-label="Data URL" />
+            <button id="fetchButton" class="primary">Load URL</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid two-cols">
+        <div>
+          <h3>Data Quality Snapshot</h3>
+          <div class="stat-grid" id="dataStats">
+            <div class="stat">
+              <p class="stat-label">Rows</p>
+              <p class="stat-value" id="rowCount">0</p>
+            </div>
+            <div class="stat">
+              <p class="stat-label">Columns</p>
+              <p class="stat-value" id="colCount">0</p>
+            </div>
+            <div class="stat">
+              <p class="stat-label">Missing Cells</p>
+              <p class="stat-value" id="missingCount">0</p>
+            </div>
+            <div class="stat">
+              <p class="stat-label">Numeric Columns</p>
+              <p class="stat-value" id="numericCount">0</p>
+            </div>
+          </div>
+          <div class="insights" id="edaInsights">
+            <p class="hint">Load data to generate automated cleaning and EDA guidance.</p>
+          </div>
+        </div>
+        <div>
+          <h3>Preview</h3>
+          <div class="table-shell">
+            <table id="dataPreview"></table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="metrics">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Metrics Framework</p>
+          <h2>Align on search definitions and priorities</h2>
+          <p class="hint">North Star search relevance & AI adoption plus P0-P2 support metrics with trade-offs and eval alignment.</p>
+        </div>
+        <form id="metricForm" class="form-grid">
+          <input type="text" id="metricName" placeholder="Metric name (e.g., CTR uplift, latency p95)" required />
+          <select id="metricPriority">
+            <option>North Star</option>
+            <option>P0</option>
+            <option>P1</option>
+            <option>P2</option>
+          </select>
+          <select id="metricEval">
+            <option>Offline eval</option>
+            <option>Online eval</option>
+            <option>Hybrid</option>
+          </select>
+          <input type="text" id="metricDefinition" placeholder="Definition" required />
+          <input type="text" id="metricTradeoffs" placeholder="Trade-offs / meta-analysis" />
+          <button type="submit" class="primary">Add metric</button>
+        </form>
+      </div>
+      <div class="grid two-cols" id="metricBoard"></div>
+    </section>
+
+    <section class="card" id="experiments">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Experiment Framework</p>
+          <h2>Design, power, and readouts for search</h2>
+          <p class="hint">Goal, guardrails, power analysis, and go/no-go decisions for ranking/reranking or generative answers.</p>
+        </div>
+      </div>
+      <div class="grid three-cols responsive">
+        <div class="panel">
+          <h3>Design the experiment</h3>
+          <label>Goal <textarea id="expGoal" rows="3" placeholder="Boost top-3 relevance, grow AI adoption..."></textarea></label>
+          <label>Guardrails (LLM evals) <textarea id="expGuardrails" rows="3" placeholder="Toxicity, hallucination, latency, bias checks"></textarea></label>
+          <label>Primary metric <select id="expMetric"></select></label>
+          <button class="secondary" id="generateDesign">Generate plan</button>
+          <div class="notebook" id="designOutput">Design brief will appear here.</div>
+        </div>
+        <div class="panel">
+          <h3>Power analysis</h3>
+          <label>Baseline value <input type="number" id="baselineValue" value="0.25" step="0.01"></label>
+          <label>Min detectable effect <input type="number" id="mde" value="0.02" step="0.01"></label>
+          <label>Alpha <select id="alphaLevel"><option value="0.05">0.05</option><option value="0.01">0.01</option></select></label>
+          <label>Power <select id="targetPower"><option value="0.8">80%</option><option value="0.9">90%</option></select></label>
+          <button class="secondary" id="calcPower">Estimate sample size</button>
+          <div class="notebook" id="powerOutput">Sample size guidance will appear here.</div>
+        </div>
+        <div class="panel">
+          <h3>Readouts & go/no-go</h3>
+          <label>MDF / effect observed <input type="number" id="observedEffect" value="0.0" step="0.01"></label>
+          <label>Decision rule <select id="goNoGoRule"><option>Effect >= MDE and guardrails green</option><option>DS approval required</option><option>LLM readout assist</option></select></label>
+          <label><input type="checkbox" id="dsApproval"> DS approval recorded</label>
+          <button class="secondary" id="runReadout">Run LLM-assisted readout</button>
+          <div class="notebook" id="readoutOutput">Summaries and guardrail checks will appear here.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="reporting">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Reporting & Alerting</p>
+          <h2>Dashboards with holdouts and drift detection</h2>
+          <p class="hint">Integrate with tooling standards, align alerting and spike detection for search relevance and AI adoption.</p>
+        </div>
+      </div>
+      <div class="grid three-cols responsive">
+        <div class="panel">
+          <h3>Dashboard & holdout</h3>
+          <label>Holdout percentage <input type="range" id="holdout" min="5" max="30" value="10"> <span id="holdoutValue">10%</span></label>
+          <div class="dash-grid" id="dashboard"></div>
+        </div>
+        <div class="panel">
+          <h3>Alerts</h3>
+          <label>Spike threshold (%) <input type="number" id="spikeThreshold" value="15" step="1"></label>
+          <label>Drift threshold (%) <input type="number" id="driftThreshold" value="8" step="1"></label>
+          <button class="secondary" id="runAlerts">Run alert scan</button>
+          <div class="notebook" id="alertOutput">Alerting results will appear here.</div>
+        </div>
+        <div class="panel">
+          <h3>LLM-based reporting</h3>
+          <p class="hint">Auto-generate MDF-driven updates with relevance/adoption deltas, guardrail status, and next steps.</p>
+          <button class="secondary" id="generateReport">Generate report</button>
+          <div class="notebook" id="reportOutput">An AI-style summary will appear here.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="planning">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Planning & Goaling</p>
+          <h2>Size, prioritize, and forecast</h2>
+          <p class="hint">Align search business goals with DS milestones using impact/effort scoring and predictions.</p>
+        </div>
+      </div>
+      <div class="grid two-cols responsive">
+        <div class="panel">
+          <h3>Initiative sizing</h3>
+          <label>Initiative <input type="text" id="planName" placeholder="LLM reranking, eval coverage..." /></label>
+          <label>Impact (1-10) <input type="number" id="planImpact" value="7" min="1" max="10"></label>
+          <label>Effort (1-10) <input type="number" id="planEffort" value="5" min="1" max="10"></label>
+          <button class="secondary" id="addPlan">Add to roadmap</button>
+          <div class="notebook" id="planList">No initiatives yet.</div>
+        </div>
+        <div class="panel">
+          <h3>Goal predictions</h3>
+          <label>Current value <input type="number" id="goalCurrent" value="0.2" step="0.01"></label>
+          <label>Target value <input type="number" id="goalTarget" value="0.35" step="0.01"></label>
+          <label>Time horizon (weeks) <input type="number" id="goalWeeks" value="8" min="1"></label>
+          <label>Expected weekly lift (%) <input type="number" id="goalLift" value="5" step="0.5"></label>
+          <button class="secondary" id="projectGoal">Project trajectory</button>
+          <div class="notebook" id="goalOutput">Forecasts will appear here.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">Built for data scientists to unify metrics, experiments, and business impact.</footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
